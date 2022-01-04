@@ -1,0 +1,1 @@
+.content{display:flex;padding:50rpx;flex-direction:column;justify-content:center;align-items:center}.content .opt_item{width:80vw;height:80rpx;margin:40rpx;font-size:inherit;font-weight:700;color:#1b1c1d;background:linear-gradient(#fff,#ededed);box-shadow:5rpx 5rpx 5rpx 0 #8288a0;border-radius:10rpx}.content .btn-hover{background:linear-gradient(#ededed,#fff)}

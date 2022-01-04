@@ -1,0 +1,1 @@
+.content{display:flex;height:100vh;flex-direction:column;align-items:center;justify-content:center}.content .btn_grp button{margin:100rpx;width:200rpx;height:200rpx;line-height:200rpx;border-radius:100rpx;box-shadow:0 0 20px 0 #000}

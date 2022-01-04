@@ -1,0 +1,43 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "小酒馆的地下仓库"
+			}
+		}
+	    ,{
+            "path" : "pages/navigation/navigation",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "小酒馆的地下仓库",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/countdown/countdown",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "下班倒计时",
+                "enablePullDownRefresh": true
+            }
+            
+        }
+        ,{
+            "path" : "pages/planeGame/planeGame",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "飞机大战",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "小酒馆的地下仓库",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	}
+}

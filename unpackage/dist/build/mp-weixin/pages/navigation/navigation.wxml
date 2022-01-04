@@ -1,0 +1,1 @@
+<view class="content"><view class="option"><block wx:for="{{itemList}}" wx:for-item="item" wx:for-index="__i0__" wx:key="id"><button class="opt_item" hover-class="btn-hover" type="default" size="default" data-event-opts="{{[['tap',[['handlerGoPage',['$0'],[[['itemList','id',item.id,'url']]]]]]]}}" bindtap="__e">{{''+item.text+''}}</button></block></view></view>
