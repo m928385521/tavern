@@ -37,6 +37,7 @@
 
 <script>
 	let canvas = null
+	// git提交测试
 	export default {
 		data() {
 			return {
