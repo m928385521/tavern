@@ -24,11 +24,14 @@
 				style="position: absolute; top:{{item.top}}px;left:{{item.left}}px;width: 60px;height: 36px;"
 				src="../../images/airplaneGame/boom2.png"></image>
 		</view> -->
+			<view class="score">
+				{{score*10}}
+			</view>
 			<canvas style="width: 100vw; height: 100vh;" canvas-id="myCanvas" id="firstCanvas" disable-scroll="false"
 				@touchstart="touchStart" @touchmove="touchMove"></canvas>
 			<view v-if="overFlg === true" class="overBoard">
 				<text class="title">游戏结束</text>
-				<text>最终得分：{{score}}</text>
+				<text>最终得分：{{score*10}}</text>
 				<button @click="gameAgain">再来一次</button>
 			</view>
 		</view>
@@ -136,8 +139,12 @@
 			},
 			// 设置我方飞机的位置
 			setMyPlanePosition(e) {
-				this.myPlaneInfo.x = (e.touches[0].x || e.touches[0].pageX) - 30
-				this.myPlaneInfo.y = (e.touches[0].y || e.touches[0].pageY) - 18
+				// 我方飞机存在的时候才可以设置位置
+				if (this.myPlaneInfo.showFlg) {
+
+					this.myPlaneInfo.x = (e.touches[0].x || e.touches[0].pageX) - 30
+					this.myPlaneInfo.y = (e.touches[0].y || e.touches[0].pageY) - 18
+				}
 
 			},
 			// 再来一次按钮
@@ -146,7 +153,12 @@
 			},
 			// 开始游戏
 			gameBegin() {
-				canvas.drawImage('/static/planeGame/plane.png', this.myPlaneInfo.x, this.myPlaneInfo.y, 60, 36)
+				if (this.myPlaneInfo.showFlg) {
+					canvas.drawImage('/static/planeGame/plane.png', this.myPlaneInfo.x, this.myPlaneInfo.y, 60, 36)
+				} else {
+					canvas.drawImage('/static/planeGame/boom2.png', this.myPlaneInfo.x + 30, this
+						.myPlaneInfo.y + 18, 60, 36)
+				}
 
 				this.draw()
 
@@ -158,6 +170,7 @@
 			},
 			// 绘制图形
 			draw() {
+				// 子弹向上移动
 				this.bulletList = this.bulletList.map((e) => {
 					if (e.y - 12 >= 0) {
 						e.y = e.y - 12
@@ -165,13 +178,57 @@
 					}
 				}).filter(e => e)
 
+				// 飞机向下运动
 				this.planeList = this.planeList.map((e) => {
 					if (e.y + e.speed <= this.windowHeight) {
 						e.y = e.y + e.speed
-						return e
+
+						// 判断飞机和子弹碰撞
+						let bulletIndex = this.bulletList.findIndex((be) => {
+							return this.crash(e, be, false)
+						})
+						if (bulletIndex > -1) {
+							this.boomList.push({
+								x: e.x,
+								y: e.y,
+								time: 100
+							})
+							this.bulletList.splice(bulletIndex, 1)
+							this.score++
+						} else if (this.crash(e, this.myPlaneInfo, true)) {
+							// 判断飞机和玩家飞机碰撞
+							this.boomList.push({
+								x: e.x,
+								y: e.y,
+								time: 100
+							})
+
+
+							clearInterval(this.planeTimer)
+							clearInterval(this.bulletTimer)
+							console.log(this.planeList.length)
+
+							this.myPlaneInfo.showFlg = false
+						} else {
+
+							return e
+						}
 					}
 				}).filter(e => e)
 
+				// 我方飞机死亡且敌方飞机数量为0时 停止游戏计时器  显示结算画面
+				if (this.myPlaneInfo.showFlg == false && this.planeList.length == 0) {
+					clearInterval(this.gameTimer);
+
+					this.overFlg = true
+				}
+				// 爆炸图消失
+				this.boomList = this.boomList.map((e) => {
+					if (e.time - 10 > 0) {
+						e.time = e.time - 10
+						return e
+					}
+				}).filter(e => e)
 
 				for (let s of this.planeList) {
 					canvas.drawImage('/static/planeGame/enemy.png', s.x - 11.5, s.y - 15, 23, 30)
@@ -198,6 +255,37 @@
 					speed: Math.random() * 3 + 2
 				})
 			},
+			// 碰撞判断方法
+			crash(plane, obj, myPlaneFlg) {
+				// 我方飞机存在的时候进行判断
+				if (this.myPlaneInfo.showFlg) {
+					if (myPlaneFlg) {
+						if (plane.x > obj.x + 60 || plane.x + 23 < obj.x || plane.y > obj.y + 36 || plane.y + 30 < obj.y) {
+							return false
+						} else {
+							return true
+						}
+					} else {
+						if (plane.x > obj.x + 6 || plane.x + 23 < obj.x || plane.y > obj.y + 22 || plane.y + 30 < obj.y) {
+							return false
+						} else {
+							return true
+						}
+					}
+				} else {
+					return false
+				}
+			},
+			// 碰撞后执行
+			crashHandler(plane, obj, myPlaneFlg) {
+
+			},
+			// 清理定时器
+			clearInterval() {
+				clearInterval(this.gameTimer)
+				clearInterval(this.planeTimer)
+				clearInterval(this.bulletTimer)
+			}
 
 		},
 		computed: {

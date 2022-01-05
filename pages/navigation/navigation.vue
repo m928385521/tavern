@@ -27,7 +27,7 @@
 					}, {
 						id: 3,
 						text: "书店地图",
-						url: "/pages/navigation/navigation"
+						url: ""
 					}, {
 						id: 4,
 						text: "待开发。。。",

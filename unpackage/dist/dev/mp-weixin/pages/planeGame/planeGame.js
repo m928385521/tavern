@@ -167,9 +167,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
-var canvas = null;var _default =
-{
+var canvas = null;
+// git提交测试
+var _default = {
   data: function data() {
     return {
       showFlg: 0, // 游戏界面显示 0 选择难度  1 canvas游戏界面
@@ -267,8 +271,12 @@ var canvas = null;var _default =
     },
     // 设置我方飞机的位置
     setMyPlanePosition: function setMyPlanePosition(e) {
-      this.myPlaneInfo.x = (e.touches[0].x || e.touches[0].pageX) - 30;
-      this.myPlaneInfo.y = (e.touches[0].y || e.touches[0].pageY) - 18;
+      // 我方飞机存在的时候才可以设置位置
+      if (this.myPlaneInfo.showFlg) {
+
+        this.myPlaneInfo.x = (e.touches[0].x || e.touches[0].pageX) - 30;
+        this.myPlaneInfo.y = (e.touches[0].y || e.touches[0].pageY) - 18;
+      }
 
     },
     // 再来一次按钮
@@ -277,7 +285,12 @@ var canvas = null;var _default =
     },
     // 开始游戏
     gameBegin: function gameBegin() {
-      canvas.drawImage('/static/planeGame/plane.png', this.myPlaneInfo.x, this.myPlaneInfo.y, 60, 36);
+      if (this.myPlaneInfo.showFlg) {
+        canvas.drawImage('/static/planeGame/plane.png', this.myPlaneInfo.x, this.myPlaneInfo.y, 60, 36);
+      } else {
+        canvas.drawImage('/static/planeGame/boom2.png', this.myPlaneInfo.x + 30, this.
+        myPlaneInfo.y + 18, 60, 36);
+      }
 
       this.draw();
 
@@ -289,6 +302,7 @@ var canvas = null;var _default =
     },
     // 绘制图形
     draw: function draw() {var _this3 = this;
+      // 子弹向上移动
       this.bulletList = this.bulletList.map(function (e) {
         if (e.y - 12 >= 0) {
           e.y = e.y - 12;
@@ -296,13 +310,57 @@ var canvas = null;var _default =
         }
       }).filter(function (e) {return e;});
 
+      // 飞机向下运动
       this.planeList = this.planeList.map(function (e) {
         if (e.y + e.speed <= _this3.windowHeight) {
           e.y = e.y + e.speed;
+
+          // 判断飞机和子弹碰撞
+          var bulletIndex = _this3.bulletList.findIndex(function (be) {
+            return _this3.crash(e, be, false);
+          });
+          if (bulletIndex > -1) {
+            _this3.boomList.push({
+              x: e.x,
+              y: e.y,
+              time: 100 });
+
+            _this3.bulletList.splice(bulletIndex, 1);
+            _this3.score++;
+          } else if (_this3.crash(e, _this3.myPlaneInfo, true)) {
+            // 判断飞机和玩家飞机碰撞
+            _this3.boomList.push({
+              x: e.x,
+              y: e.y,
+              time: 100 });
+
+
+
+            clearInterval(_this3.planeTimer);
+            clearInterval(_this3.bulletTimer);
+            console.log(_this3.planeList.length);
+
+            _this3.myPlaneInfo.showFlg = false;
+          } else {
+
+            return e;
+          }
+        }
+      }).filter(function (e) {return e;});
+
+      // 我方飞机死亡且敌方飞机数量为0时 停止游戏计时器  显示结算画面
+      if (this.myPlaneInfo.showFlg == false && this.planeList.length == 0) {
+        clearInterval(this.gameTimer);
+
+        this.overFlg = true;
+      }
+      // 爆炸图消失
+      this.boomList = this.boomList.map(function (e) {
+        if (e.time - 10 > 0) {
+          e.time = e.time - 10;
           return e;
         }
       }).filter(function (e) {return e;});var _iterator = _createForOfIteratorHelper(
-
 
       this.planeList),_step;try {for (_iterator.s(); !(_step = _iterator.n()).done;) {var s = _step.value;
           canvas.drawImage('/static/planeGame/enemy.png', s.x - 11.5, s.y - 15, 23, 30);
@@ -328,7 +386,38 @@ var canvas = null;var _default =
         y: -30,
         speed: Math.random() * 3 + 2 });
 
-    } },
+    },
+    // 碰撞判断方法
+    crash: function crash(plane, obj, myPlaneFlg) {
+      // 我方飞机存在的时候进行判断
+      if (this.myPlaneInfo.showFlg) {
+        if (myPlaneFlg) {
+          if (plane.x > obj.x + 60 || plane.x + 23 < obj.x || plane.y > obj.y + 36 || plane.y + 30 < obj.y) {
+            return false;
+          } else {
+            return true;
+          }
+        } else {
+          if (plane.x > obj.x + 6 || plane.x + 23 < obj.x || plane.y > obj.y + 22 || plane.y + 30 < obj.y) {
+            return false;
+          } else {
+            return true;
+          }
+        }
+      } else {
+        return false;
+      }
+    },
+    // 碰撞后执行
+    crashHandler: function crashHandler(plane, obj, myPlaneFlg) {
+
+    },
+    // 清理定时器
+    clearInterval: function (_clearInterval) {function clearInterval() {return _clearInterval.apply(this, arguments);}clearInterval.toString = function () {return _clearInterval.toString();};return clearInterval;}(function () {
+      clearInterval(this.gameTimer);
+      clearInterval(this.planeTimer);
+      clearInterval(this.bulletTimer);
+    }) },
 
 
   computed: {
