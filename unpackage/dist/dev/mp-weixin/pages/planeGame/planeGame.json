@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "飞机大战",
   "enablePullDownRefresh": false,
+  "disableScroll": true,
   "usingComponents": {}
 }

@@ -27,8 +27,8 @@
 			<view class="score">
 				{{score*10}}
 			</view>
-			<canvas style="width: 100vw; height: 100vh;" canvas-id="myCanvas" id="firstCanvas" disable-scroll="false"
-				@touchstart="touchStart" @touchmove="touchMove"></canvas>
+			<canvas disable-scroll="true" style="width: 100vw; height: 100vh;" canvas-id="myCanvas" id="firstCanvas" @touchstart.native.prevent="touchStart"
+				@touchmove.native.prevent="touchMove" @touchend.native.prevent="touchend" ></canvas>
 			<view v-if="overFlg === true" class="overBoard">
 				<text class="title">游戏结束</text>
 				<text>最终得分：{{score*10}}</text>
@@ -75,8 +75,8 @@
 					{
 						id: 4,
 						title: "神降",
-						bulletSpeed: 20,
-						planeSpeed: 40
+						bulletSpeed: 30,
+						planeSpeed: 80
 					}
 				],
 				// 我方飞机数据
@@ -97,23 +97,16 @@
 			};
 		},
 		onReady() {
-
-
 			canvas = uni.createCanvasContext("myCanvas", this)
 			let _this = this
 			uni.getSystemInfo({
-
 				success(res) {
-					console.log(res)
-					// canvas.beginPath()
-					_this.myPlaneInfo.x = res.windowWidth / 2 - 30
-					_this.myPlaneInfo.y = res.windowHeight - 60
 					_this.windowWidth = res.windowWidth
 					_this.windowHeight = res.windowHeight
+					_this.setdefaultPostion()
 
 				}
 			})
-
 		},
 		methods: {
 			// 设置游戏难度
@@ -150,14 +143,18 @@
 			// 再来一次按钮
 			gameAgain() {
 				this.overFlg = false
+				this.score = 0
+				this.showFlg = 0
+				this.myPlaneInfo.showFlg = true
+				this.setdefaultPostion()
 			},
 			// 开始游戏
 			gameBegin() {
 				if (this.myPlaneInfo.showFlg) {
 					canvas.drawImage('/static/planeGame/plane.png', this.myPlaneInfo.x, this.myPlaneInfo.y, 60, 36)
 				} else {
-					canvas.drawImage('/static/planeGame/boom2.png', this.myPlaneInfo.x + 30, this
-						.myPlaneInfo.y + 18, 60, 36)
+					canvas.drawImage('/static/planeGame/boom2.png', this.myPlaneInfo.x, this
+						.myPlaneInfo.y, 60, 36)
 				}
 
 				this.draw()
@@ -206,7 +203,6 @@
 
 							clearInterval(this.planeTimer)
 							clearInterval(this.bulletTimer)
-							console.log(this.planeList.length)
 
 							this.myPlaneInfo.showFlg = false
 						} else {
@@ -231,13 +227,13 @@
 				}).filter(e => e)
 
 				for (let s of this.planeList) {
-					canvas.drawImage('/static/planeGame/enemy.png', s.x - 11.5, s.y - 15, 23, 30)
+					canvas.drawImage('/static/planeGame/enemy.png', s.x, s.y, 23, 30)
 				}
 				for (let s of this.bulletList) {
 					canvas.drawImage('/static/planeGame/bullet.png', s.x - 3, s.y - 11, 6, 22)
 				}
 				for (let s of this.boomList) {
-					canvas.drawImage('/static/planeGame/boom1.png', s.x - 11.5, s.y - 15, 23, 30)
+					canvas.drawImage('/static/planeGame/boom1.png', s.x, s.y, 23, 30)
 				}
 			},
 			// 生成子弹
@@ -276,26 +272,22 @@
 					return false
 				}
 			},
-			// 碰撞后执行
-			crashHandler(plane, obj, myPlaneFlg) {
+			// 设置我方飞机的初始位置
+			setdefaultPostion() {
+				this.myPlaneInfo.x = this.windowWidth / 2 - 30
+				this.myPlaneInfo.y = this.windowHeight - 60
+			},
+			// 重启游戏
+			replaceGame() {
 
 			},
-			// 清理定时器
-			clearInterval() {
-				clearInterval(this.gameTimer)
-				clearInterval(this.planeTimer)
-				clearInterval(this.bulletTimer)
-			}
+			touchend(){}
 
-		},
-		computed: {
-			myPlaneStyle() {
-				return `left: ${this.myPlaneInfo.left}px; top: ${this.myPlaneInfo.top}px`
-			}
 		},
 		onUnload() {
 			clearInterval(this.gameTimer)
 			clearInterval(this.bulletTimer)
+			clearInterval(this.planeTimer)
 		}
 
 	}
@@ -332,6 +324,12 @@
 		width: 100vw;
 		height: 100vh;
 		overflow: hidden;
+
+		.score {
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
 	}
 
 	.game-box image {
@@ -369,7 +367,7 @@
 	}
 
 	.game-box .overBoard button {
-		color: white;
+		color: black;
 		border: 1px solid white;
 	}
 

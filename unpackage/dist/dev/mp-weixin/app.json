@@ -5,7 +5,6 @@
         "pages/countdown/countdown",
         "pages/planeGame/planeGame"
     ],
-    "subPackages": [],
     "window": {
         "navigationBarTextStyle": "black",
         "navigationBarTitleText": "小酒馆的地下仓库",

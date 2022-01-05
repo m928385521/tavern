@@ -1,7 +1,7 @@
 {
   "navigationBarTitleText": "下班倒计时",
-  "enablePullDownRefresh": true,
+  "enablePullDownRefresh": false,
   "usingComponents": {
-    "clock": "/components/clock"
+    "clock": "../../components/clock"
   }
 }
